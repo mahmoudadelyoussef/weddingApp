@@ -1,4 +1,6 @@
+import { useCallback } from 'react'
 import './App.css'
+import { buildWeddingIcsFile, downloadIcsFile } from './calendarIcs'
 
 const TICKER =
   'YOU ARE INVITED • MAHMOUD & NOURHAN • YOU ARE INVITED • MAHMOUD & NOURHAN • '
@@ -37,6 +39,11 @@ function IconPin({ className }: { className?: string }) {
 }
 
 function App() {
+  const handleAddToCalendar = useCallback(() => {
+    const ics = buildWeddingIcsFile()
+    downloadIcsFile(ics, 'mahmoud-nourhan-wedding.ics')
+  }, [])
+
   return (
     <div className="invitation">
       <div className="marquee" aria-hidden="true">
@@ -89,14 +96,23 @@ function App() {
               </div>
             </div>
 
-            <a
-              className="card__cta card-reveal"
-              href="https://maps.app.goo.gl/7uWuVi5djJRUnc346"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              View Location
-            </a>
+            <div className="card__actions card-reveal">
+              <a
+                className="card__cta"
+                href="https://maps.app.goo.gl/7uWuVi5djJRUnc346"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View Location
+              </a>
+              <button
+                type="button"
+                className="card__cta card__cta--secondary"
+                onClick={handleAddToCalendar}
+              >
+                Add to calendar
+              </button>
+            </div>
 
             <p className="card__footer card-reveal">
               We look forward to celebrating with you
