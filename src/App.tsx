@@ -1,6 +1,4 @@
-import { useCallback } from 'react'
 import './App.css'
-import { addEventToNativeCalendar, buildWeddingIcsFile } from './calendarIcs'
 
 const TICKER =
   'YOU ARE INVITED • MAHMOUD & NOURHAN • YOU ARE INVITED • MAHMOUD & NOURHAN • '
@@ -39,11 +37,6 @@ function IconPin({ className }: { className?: string }) {
 }
 
 function App() {
-  const handleAddToCalendar = useCallback(() => {
-    const ics = buildWeddingIcsFile()
-    void addEventToNativeCalendar(ics, 'mahmoud-nourhan-wedding.ics')
-  }, [])
-
   return (
     <div className="invitation">
       <div className="marquee" aria-hidden="true">
@@ -54,11 +47,6 @@ function App() {
       </div>
 
       <div className="invitation__scene">
-        <div className="watercolor watercolor--one" aria-hidden="true" />
-        <div className="watercolor watercolor--two" aria-hidden="true" />
-        <div className="watercolor watercolor--three" aria-hidden="true" />
-        <div className="watercolor watercolor--four" aria-hidden="true" />
-
         <div className="card-shell">
           <main className="card">
             <header className="card__header card-reveal">
@@ -78,6 +66,8 @@ function App() {
               Request the honour of your presence at the celebration of their marriage
             </p>
 
+            <div className="card__divider card-reveal" aria-hidden="true" />
+
             <div className="card__facts card-reveal">
               <div className="fact">
                 <IconCalendar className="fact__icon" />
@@ -92,28 +82,18 @@ function App() {
               <div className="fact">
                 <IconPin className="fact__icon" />
                 <span className="fact__label">Location</span>
-                <span className="fact__value">Infantry House ( Star Garden )</span>
+                <span className="fact__value">Infantry House (Star Garden)</span>
               </div>
             </div>
 
-            <div className="card__actions card-reveal">
-              <a
-                className="card__cta"
-                href="https://maps.app.goo.gl/7uWuVi5djJRUnc346"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                View Location
-              </a>
-              <button
-                type="button"
-                className="card__cta card__cta--secondary"
-                onClick={handleAddToCalendar}
-                aria-label="Add wedding to your phone calendar"
-              >
-                Add to calendar
-              </button>
-            </div>
+            <a
+              className="card__cta card-reveal"
+              href="https://maps.app.goo.gl/7uWuVi5djJRUnc346"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View Location
+            </a>
 
             <p className="card__footer card-reveal">
               We look forward to celebrating with you
