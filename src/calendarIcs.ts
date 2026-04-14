@@ -62,10 +62,13 @@ export function buildWeddingIcsFile(): string {
   return lines.map(foldIcsLine).join('\r\n')
 }
 
-export function downloadIcsFile(body: string, filename: string): void {
-  const blob = new Blob([body], { type: 'text/calendar;charset=utf-8' })
-  const url = URL.createObjectURL(blob)
+function isMobileUserAgent(): boolean {
+  return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+}
 
+function triggerDownload(icsBody: string, filename: string): void {
+  const blob = new Blob([icsBody], { type: 'text/calendar;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
   link.download = filename
@@ -73,6 +76,58 @@ export function downloadIcsFile(body: string, filename: string): void {
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
-
   window.setTimeout(() => URL.revokeObjectURL(url), 2500)
+}
+
+/**
+ * Prefer opening the system calendar / share sheet instead of only downloading a file.
+ * 1) Web Share with .ics (iOS/Android often show “Add to Calendar” or similar)
+ * 2) Open calendar data in a new tab (no `download` attribute)
+ * 3) Same-tab open on mobile if pop-ups are blocked (user can go Back)
+ * 4) Download .ics as last resort (typical desktop fallback)
+ */
+export async function addEventToNativeCalendar(
+  icsBody: string,
+  filename: string,
+): Promise<void> {
+  const file = new File([icsBody], filename, {
+    type: 'text/calendar',
+    lastModified: Date.now(),
+  })
+
+  const sharePayload: ShareData = {
+    files: [file],
+    title: WEDDING_CALENDAR.title,
+    text: 'Add this wedding to your calendar.',
+  }
+
+  if (typeof navigator.share === 'function') {
+    try {
+      const canShareFiles =
+        typeof navigator.canShare !== 'function' || navigator.canShare(sharePayload)
+      if (canShareFiles) {
+        await navigator.share(sharePayload)
+        return
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name === 'AbortError') return
+    }
+  }
+
+  const blob = new Blob([icsBody], { type: 'text/calendar;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const revokeLater = () => window.setTimeout(() => URL.revokeObjectURL(url), 120_000)
+
+  const opened = window.open(url, '_blank', 'noopener,noreferrer')
+  if (opened) {
+    revokeLater()
+    return
+  }
+
+  if (isMobileUserAgent()) {
+    window.location.assign(url)
+    return
+  }
+
+  triggerDownload(icsBody, filename)
 }

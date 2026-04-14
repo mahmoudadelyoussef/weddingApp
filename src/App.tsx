@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import './App.css'
-import { buildWeddingIcsFile, downloadIcsFile } from './calendarIcs'
+import { addEventToNativeCalendar, buildWeddingIcsFile } from './calendarIcs'
 
 const TICKER =
   'YOU ARE INVITED • MAHMOUD & NOURHAN • YOU ARE INVITED • MAHMOUD & NOURHAN • '
@@ -41,7 +41,7 @@ function IconPin({ className }: { className?: string }) {
 function App() {
   const handleAddToCalendar = useCallback(() => {
     const ics = buildWeddingIcsFile()
-    downloadIcsFile(ics, 'mahmoud-nourhan-wedding.ics')
+    void addEventToNativeCalendar(ics, 'mahmoud-nourhan-wedding.ics')
   }, [])
 
   return (
@@ -109,6 +109,7 @@ function App() {
                 type="button"
                 className="card__cta card__cta--secondary"
                 onClick={handleAddToCalendar}
+                aria-label="Add wedding to your phone calendar"
               >
                 Add to calendar
               </button>
